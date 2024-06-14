@@ -1,0 +1,112 @@
+import 'dart:io';
+import 'package:collection/collection.dart';
+
+class Task {
+  int id;
+  String description;
+
+  Task(this.id, this.description);
+
+  @override
+  String toString() {
+    return 'Task{id: $id, description: $description}';
+  }
+}
+
+class TaskManager {
+  List<Task> tasks = [];
+  int nextId = 1;
+
+  void addTask(String description) {
+    var task = Task(nextId, description);
+    tasks.add(task);
+    nextId++;
+    print('Task added: $task');
+  }
+
+  void editTask(int id, String newDescription) {
+    var task = tasks.firstWhereOrNull((task) => task.id == id);
+    if (task != null) {
+      task.description = newDescription;
+      print('Task updated: $task');
+    } else {
+      print('Task not found');
+    }
+  }
+
+  void deleteTask(int id) {
+    tasks.removeWhere((task) => task.id == id);
+    print('Task deleted with id: $id');
+  }
+
+  void listTasks() {
+    if (tasks.isEmpty) {
+      print('No tasks available.');
+    } else {
+      tasks.forEach(printTask);
+    }
+  }
+
+  void printTask(Task task) {
+    print(task);
+  }
+}
+
+void main() {
+  var taskManager = TaskManager();
+  while (true) {
+    try {
+      print('1. Add task');
+      print('2. Edit task');
+      print('3. Delete task');
+      print('4. List tasks');
+      print('5. Exit');
+      stdout.write('Choose an option: ');
+      var choice = stdin.readLineSync();
+      switch (choice) {
+        case '1':
+          stdout.write('Enter task description: ');
+          var description = stdin.readLineSync();
+          if (description != null && description.isNotEmpty) {
+            taskManager.addTask(description);
+          } else {
+            print('Invalid description.');
+          }
+          break;
+        case '2':
+          stdout.write('Enter task ID to edit: ');
+          var id = int.tryParse(stdin.readLineSync() ?? '');
+          if (id != null) {
+            stdout.write('Enter new task description: ');
+            var newDescription = stdin.readLineSync();
+            if (newDescription != null && newDescription.isNotEmpty) {
+              taskManager.editTask(id, newDescription);
+            } else {
+              print('Invalid description.');
+            }
+          } else {
+            print('Invalid ID.');
+          }
+          break;
+        case '3':
+          stdout.write('Enter task ID to delete: ');
+          var id = int.tryParse(stdin.readLineSync() ?? '');
+          if (id != null) {
+            taskManager.deleteTask(id);
+          } else {
+            print('Invalid ID.');
+          }
+          break;
+        case '4':
+          taskManager.listTasks();
+          break;
+        case '5':
+          exit(0);
+        default:
+          print('Invalid option.');
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+    }
+  }
+}
